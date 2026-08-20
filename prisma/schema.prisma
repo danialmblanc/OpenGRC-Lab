@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Journey {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  description   String
+  category      String
+  difficulty    String
+  estimatedTime String
+  xpReward      Int
+  thumbnail     String?
+  status        String   @default("Draft")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  modules       Module[]
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      String   @default("Published")
+  sortOrder   Int      @default(0)
+  journeyId   String
+  journey     Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  paths       Path[]
+}
+
+model Path {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  status      String   @default("Published")
+  sortOrder   Int      @default(0)
+  moduleId    String
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  labs        Lab[]
+}
+
+model Lab {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  description   String
+  type          String   @default("lab") // lab, case-study, video
+  difficulty    String
+  estimatedTime String
+  xpReward      Int
+  objectives    String   // Stored as JSON string
+  videoUrl      String?
+  transcript    String?
+  status        String   @default("Draft")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  pathId        String?
+  path          Path?    @relation(fields: [pathId], references: [id])
+  tasks         Task[]
+}
+
+model Task {
+  id            String   @id @default(cuid())
+  type          String
+  question      String
+  description   String?
+  options       String?  // Stored as JSON string
+  correctAnswer String   // Stored as JSON string
+  explanation   String
+  hint          String?
+  sortOrder     Int      @default(0)
+  labId         String
+  lab           Lab      @relation(fields: [labId], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String
+  createdAt   DateTime @default(now())
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  type      String
+  size      Int
+  createdAt DateTime @default(now())
+}

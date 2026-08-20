@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:./dev.db
+      - NEXT_PUBLIC_DEMO_MODE=true
+      - DEMO_AUTH_ENABLED=true
+    volumes:
+      - ./prisma:/app/prisma
+      - ./public/uploads:/app/public/uploads
+
+# Uncomment if you want to use PostgreSQL
+#  db:
+#    image: postgres:15
+#    environment:
+#      POSTGRES_USER: user
+#      POSTGRES_PASSWORD: password
+#      POSTGRES_DB: opengrc
+#    ports:
+#      - "5432:5432"
